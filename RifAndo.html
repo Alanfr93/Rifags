@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🎉 Sorteo Explosivo AGS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Montserrat', sans-serif;
+      background: radial-gradient(circle, #ff512f, #dd2476);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .sorteo-box {
+      background: rgba(255, 255, 255, 0.95);
+      color: #111;
+      border-radius: 20px;
+      padding: 50px 30px;
+      text-align: center;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+      animation: entrada 1s ease-out;
+      position: relative;
+    }
+
+    @keyframes entrada {
+      from {
+        opacity: 0;
+        transform: scale(0.8) translateY(50px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    h1 {
+      font-size: 2.8em;
+      color: #e91e63;
+      margin-bottom: 20px;
+      animation: glow 2s infinite alternate;
+    }
+
+    @keyframes glow {
+      from {
+        text-shadow: 0 0 10px #ffeb3b;
+      }
+      to {
+        text-shadow: 0 0 20px #ff9800;
+      }
+    }
+
+    p {
+      font-size: 1.2em;
+      margin-bottom: 30px;
+      color: #444;
+    }
+
+    #numeroFijo {
+      font-size: 2.5em;
+      font-weight: 900;
+      color: #e91e63;
+      margin-top: 30px;
+    }
+
+    button {
+      background-color: #ff0066;
+      color: white;
+      font-size: 1.5em;
+      font-weight: bold;
+      padding: 18px 35px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    button:hover {
+      background-color: #c40052;
+      transform: scale(1.05);
+    }
+
+    #resultado {
+      font-size: 1.3em;
+      margin-top: 30px;
+      color: #333;
+      min-height: 30px;
+    }
+
+    .ganador-banner {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: #fff;
+      border: 6px solid #ff0066;
+      padding: 50px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      text-align: center;
+      z-index: 1000;
+      transition: all 0.5s ease;
+      opacity: 0;
+    }
+
+    .ganador-banner.show {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+
+    .ganador-banner h2 {
+      font-size: 3em;
+      color: #4caf50;
+    }
+
+    .ganador-numero {
+      font-size: 6em;
+      font-weight: 900;
+      color: #e91e63;
+    }
+
+    .confetti {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background-color: var(--color);
+      animation: fall 3s linear forwards;
+      opacity: 0;
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+
+    .cerrar-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      background: #ff0000;
+      color: white;
+      border: none;
+      font-size: 1.5em;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .cerrar-btn:hover {
+      background: #cc0000;
+    }
+  </style>
+</head>
+<body>
+  <div class="sorteo-box">
+    <h1>🎊 ¡Sorteo Explosivo AGS! 🎊</h1>
+    <p>¡Prepárate para la emoción! Un clic y podrías descubrir al afortunado del día.</p>
+    <button onclick="sortear()">🎰 GIRAR Y GANAR</button>
+    <div id="resultado"></div>
+    <div id="numeroFijo"></div>
+  </div>
+
+  <div class="ganador-banner" id="banner">
+    <button class="cerrar-btn" onclick="cerrarBanner()">×</button>
+    <h2>🎉 ¡Tenemos un GANADOR! 🎉</h2>
+    <p>El número afortunado es:</p>
+    <div class="ganador-numero" id="numeroBanner"></div>
+  </div>
+
+  <audio id="victoriaAudio" src="https://assets.mixkit.co/sfx/preview/mixkit-game-win-chimes-success-sound-2155.mp3" preload="auto"></audio>
+
+  <script>
+    function sortear() {
+      const resultado = document.getElementById("resultado");
+      const numeroFijo = document.getElementById("numeroFijo");
+      const numeroBanner = document.getElementById("numeroBanner");
+      const banner = document.getElementById("banner");
+      const victoriaAudio = document.getElementById("victoriaAudio");
+
+      resultado.textContent = "🎲 Girando la suerte... ¡Mucha atención!";
+      numeroFijo.textContent = "";
+      banner.classList.remove("show");
+
+      const frases = [
+        "🔄 La suerte está girando...",
+        "🤞 Casi, casi... ya viene...",
+        "🔥 ¡Uno más y sale el ganador!",
+      ];
+
+      let i = 0;
+      const intervalo = setInterval(() => {
+        resultado.textContent = frases[i % frases.length];
+        i++;
+      }, 700);
+
+      setTimeout(() => {
+        clearInterval(intervalo);
+        const numero = Math.floor(Math.random() * 100) + 1;
+        resultado.textContent = "🎯 ¡Número seleccionado!";
+        numeroFijo.textContent = `🎉 Número ganador: ${numero}`;
+        numeroBanner.textContent = numero;
+        banner.classList.add("show");
+
+        victoriaAudio.currentTime = 0;
+        victoriaAudio.play();
+
+        lanzarConfeti();
+      }, 3500);
+    }
+
+    function cerrarBanner() {
+      document.getElementById("banner").classList.remove("show");
+    }
+
+    function lanzarConfeti() {
+      const colors = ['#f44336', '#e91e63', '#9c27b0', '#3f51b5', '#2196f3', '#4CAF50', '#FFEB3B', '#FF9800', '#FF5722'];
+      for (let i = 0; i < 80; i++) {
+        const confetti = document.createElement("div");
+        confetti.classList.add("confetti");
+        confetti.style.left = `${Math.random() * 100}vw`;
+        confetti.style.top = `${Math.random() * -20}px`;
+        confetti.style.animationDuration = `${Math.random() * 2 + 3}s`;
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        document.body.appendChild(confetti);
+        confetti.addEventListener("animationend", () => confetti.remove());
+      }
+    }
+  </script>
+</body>
+</html>
